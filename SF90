@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <title>SF90</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button {
+      width: 90%;
+      height: 30%;
+      font-size: 2.5rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      color: white;
+      background-color: #2ecc71;
+      transition: 0.2s;
+    }
+
+    button.off {
+      background-color: #e74c3c;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+
+<body>
+  <button id="robotBtn">ZAPNÚŤ ROBOTA</button>
+
+  <script>
+    let robotOn = false;
+    const btn = document.getElementById("robotBtn");
+
+    btn.addEventListener("click", () => {
+      robotOn = !robotOn;
+
+      if (robotOn) {
+        btn.textContent = "VYPNÚŤ ROBOTA";
+        btn.classList.add("off");
+        sendCommand("on");
+      } else {
+        btn.textContent = "ZAPNÚŤ ROBOTA";
+        btn.classList.remove("off");
+        sendCommand("off");
+      }
+    });
+
+    function sendCommand(state) {
+      console.log("Robot state:", state);
+
+      // PRIPRAVENÉ NA ESP / SERVER
+      // fetch("http://IP_ADRESA_ESP/robot?state=" + state)
+      //   .catch(err => console.log(err));
+    }
+  </script>
+</body>
+</html>
