@@ -2,7 +2,7 @@
 <html lang="sk">
 <head>
   <meta charset="UTF-8" />
-  <title>ROBOT CONTROL</title>
+  <title>SF90 Robot Control</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -20,15 +20,15 @@
     .panel {
       width: 90%;
       max-width: 420px;
-      height: 60%;
       background: linear-gradient(145deg, #111, #1c1c1c);
       border-radius: 30px;
       box-shadow: inset 0 0 30px #000, 0 0 40px rgba(255,0,0,0.2);
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
       align-items: center;
       text-align: center;
+      padding: 20px;
+      gap: 15px;
     }
 
     .status {
@@ -38,7 +38,6 @@
       background: red;
       box-shadow: 0 0 10px red;
       transition: 0.3s;
-      margin-bottom: 10px;
     }
 
     .status.on {
@@ -47,17 +46,17 @@
     }
 
     button {
-      width: 85%;
-      height: 35%;
-      font-size: 2.2rem;
+      width: 80%;
+      padding: 15px;
+      font-size: 1.8rem;
       font-weight: bold;
       border: none;
       border-radius: 50px;
       color: white;
       background: linear-gradient(180deg, #ff3b3b, #a80000);
       box-shadow: 0 8px 0 #5c0000;
-      transition: 0.15s;
       cursor: pointer;
+      transition: 0.15s;
     }
 
     button.on {
@@ -66,19 +65,34 @@
     }
 
     button:active {
-      transform: translateY(6px);
+      transform: translateY(4px);
       box-shadow: 0 2px 0 #000;
     }
 
-    .label {
-      letter-spacing: 2px;
-      opacity: 0.8;
+    input {
+      width: 70%;
+      padding: 8px;
+      border-radius: 10px;
+      border: none;
       margin: 5px 0;
-      user-select: none;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .label {
+      letter-spacing: 1px;
+      opacity: 0.8;
+      margin-bottom: 5px;
     }
   </style>
 </head>
-
 <body>
   <div class="panel">
     <div class="label">ROBOT STATUS</div>
@@ -86,39 +100,45 @@
 
     <button id="robotBtn">ENGINE START</button>
 
-    <div class="label">SF90 CONTROL</div>
+    <form id="wifiForm">
+      <input type="text" id="ssid" placeholder="SSID" value="Nothing special" />
+      <input type="password" id="password" placeholder="Password" value="pesim789" />
+      <button type="submit">Connect Wi-Fi</button>
+    </form>
   </div>
 
   <script>
+    const robotBtn = document.getElementById("robotBtn");
+    const statusLed = document.getElementById("statusLed");
+    const wifiForm = document.getElementById("wifiForm");
+
     let robotOn = false;
-    const btn = document.getElementById("robotBtn");
-    const led = document.getElementById("statusLed");
 
-    btn.addEventListener("click", () => {
+    // CHANGE THIS to your robot's local IP on your Wi-Fi
+    const ROBOT_IP = "192.168.1.50"; 
+
+    // Toggle robot on/off
+    robotBtn.addEventListener("click", () => {
       robotOn = !robotOn;
+      robotBtn.textContent = robotOn ? "ENGINE STOP" : "ENGINE START";
+      robotBtn.classList.toggle("on", robotOn);
+      statusLed.classList.toggle("on", robotOn);
 
-      if (robotOn) {
-        btn.textContent = "ENGINE STOP";
-        btn.classList.add("on");
-        led.classList.add("on");
-        sendCommand("on");
-      } else {
-        btn.textContent = "ENGINE START";
-        btn.classList.remove("on");
-        led.classList.remove("on");
-        sendCommand("off");
-      }
+      fetch(`http://${ROBOT_IP}/robot?state=${robotOn ? "on" : "off"}`)
+        .then(res => console.log("Robot command sent"))
+        .catch(err => console.error("Error sending robot command:", err));
     });
 
-    function sendCommand(state) {
-      console.log("Robot state:", state);
+    // Wi-Fi form submission
+    wifiForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const ssid = document.getElementById("ssid").value;
+      const password = document.getElementById("password").value;
 
-      // Tu odkomentuj a uprav podľa svojej ESP/server adresy:
-      // fetch("http://IP_TVOJHO_ESP/robot?state=" + state)
-      //   .then(res => console.log("Príkaz odoslaný"))
-      //   .catch(err => console.error("Chyba:", err));
-    }
+      fetch(`http://${ROBOT_IP}/connect?ssid=${encodeURIComponent(ssid)}&password=${encodeURIComponent(password)}`)
+        .then(res => console.log("Wi-Fi command sent"))
+        .catch(err => console.error("Error sending Wi-Fi command:", err));
+    });
   </script>
 </body>
 </html>
-
